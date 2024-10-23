@@ -1,7 +1,6 @@
 import type { AxiosInstance, AxiosResponse } from 'axios'
 
 type GetOneAuthTokenArgs = {
-  client_id: string
   redirect_uri: string
   grant_type: 'authorization_code'
   code: string
@@ -19,29 +18,32 @@ type GetOneAuthTokenResponse = {
   scope: string
 }
 
-type MutateOneAuthSignOutArgs = {
-  client_id: string
-  refresh_token: string
+type OneAuthClientConfig = {
+  axiosInstance: AxiosInstance
+  baseUrl: string
+  clientId: string
 }
 
 export class OneAuthClient {
   private axiosClient: AxiosInstance
   private baseUrl: string
+  private clientId: string
 
-  constructor(axiosInstance: AxiosInstance, baseUrl: string) {
-    this.axiosClient = axiosInstance
-    this.baseUrl = baseUrl
+  constructor(config: OneAuthClientConfig) {
+    this.baseUrl = config.baseUrl
+    this.axiosClient = config.axiosInstance
+    this.clientId = config.clientId
   }
 
   getOneAuthToken(
     args: GetOneAuthTokenArgs,
   ): Promise<AxiosResponse<GetOneAuthTokenResponse>> {
-    const { client_id, redirect_uri, code } = args
+    const { redirect_uri, code } = args
     const body = new URLSearchParams({
-      client_id,
       redirect_uri,
-      grant_type: 'authorization_code',
       code,
+      client_id: this.clientId,
+      grant_type: 'authorization_code',
     })
     return this.axiosClient.post(this.getOneAuthEndpoint('/token'), body, {
       headers: {
@@ -53,7 +55,7 @@ export class OneAuthClient {
   redirectToOneAuth(): void {
     const oneAuthUri = new URL(this.getOneAuthEndpoint('/auth'))
     const oneAuthXSearchParams = new URLSearchParams({
-      client_id: 'qp',
+      client_id: this.clientId,
       redirect_uri: window.location.href,
       response_type: 'code',
       scope: 'openid',
@@ -62,10 +64,11 @@ export class OneAuthClient {
     window.location.href = oneAuthUri.href
   }
 
-  mutateOneAuthSignOut(
-    args: MutateOneAuthSignOutArgs,
-  ): Promise<AxiosResponse<void>> {
-    const body = new URLSearchParams(args)
+  mutateOneAuthSignOut(refreshToken: string): Promise<AxiosResponse<void>> {
+    const body = {
+      clientId: this.clientId,
+      refresh_token: refreshToken,
+    }
     return this.axiosClient.post(this.getOneAuthEndpoint('/logout'), body, {
       withCredentials: true,
       headers: {
