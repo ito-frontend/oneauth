@@ -2,19 +2,18 @@
   "name": "ts-lib-starter",
   "version": "0.0.0",
   "packageManager": "pnpm@9.12.2",
-  "description": "My awesome typescript library",
+  "description": "API for OneAD SSO",
   "type": "module",
   "license": "MIT",
-  "homepage": "https://github.com/sxzz/ts-lib-starter#readme",
+  "homepage": "https://github.com/ito-frontend/oneauth#readme",
   "bugs": {
-    "url": "https://github.com/sxzz/ts-lib-starter/issues"
+    "url": "https://github.com/ito-frontend/oneauth/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sxzz/ts-lib-starter.git"
+    "url": "git+https://github.com/ito-frontend/oneauth.git"
   },
-  "author": "三咲智子 Kevin Deng <sxzz@sxzz.moe>",
-  "funding": "https://github.com/sponsors/sxzz",
+  "author": "ito-frontend",
   "files": [
     "dist"
   ],
@@ -41,6 +40,9 @@
     "format": "prettier --cache --write .",
     "release": "bumpp && pnpm publish",
     "prepublishOnly": "pnpm run build"
+  },
+  "dependencies": {
+    "axios": "^1.7.7"
   },
   "devDependencies": {
     "@sxzz/eslint-config": "^4.4.0",
