@@ -1,6 +1,6 @@
 {
   "name": "ts-lib-starter",
-  "version": "0.0.1-beta.1",
+  "version": "0.0.1-beta.2",
   "packageManager": "pnpm@9.12.2",
   "description": "API for OneAD SSO",
   "type": "module",
