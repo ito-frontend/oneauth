@@ -19,18 +19,24 @@ type GetOneAuthTokenResponse = {
   scope: string
 }
 
+type MutateOneAuthSignOutArgs = {
+  client_id: string
+  refresh_token: string
+}
+
 export class OneAuthClient {
   private axiosClient: AxiosInstance
+  private baseUrl: string
 
-  constructor(axiosInstance: AxiosInstance) {
+  constructor(axiosInstance: AxiosInstance, baseUrl: string) {
     this.axiosClient = axiosInstance
+    this.baseUrl = baseUrl
   }
 
   getOneAuthToken(
     args: GetOneAuthTokenArgs,
   ): Promise<AxiosResponse<GetOneAuthTokenResponse>> {
     const { client_id, redirect_uri, code } = args
-
     const body = new URLSearchParams({
       client_id,
       redirect_uri,
@@ -56,11 +62,10 @@ export class OneAuthClient {
     window.location.href = oneAuthUri.href
   }
 
-  mutateOneAuthSignOut(refreshToken: string): Promise<AxiosResponse<void>> {
-    const body = new URLSearchParams({
-      client_id: 'qp',
-      refresh_token: refreshToken,
-    })
+  mutateOneAuthSignOut(
+    args: MutateOneAuthSignOutArgs,
+  ): Promise<AxiosResponse<void>> {
+    const body = new URLSearchParams(args)
     return this.axiosClient.post(this.getOneAuthEndpoint('/logout'), body, {
       withCredentials: true,
       headers: {
@@ -70,9 +75,6 @@ export class OneAuthClient {
   }
 
   private getOneAuthEndpoint(path: string): string {
-    const targetRealm = window.location.host.endsWith('onead.com.tw')
-      ? 'onead'
-      : 'ito-env'
-    return `https://accounts.onead.com.tw/realms/${targetRealm}/protocol/openid-connect${path}`
+    return `${this.baseUrl}${path}`
   }
 }
